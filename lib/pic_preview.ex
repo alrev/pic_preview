@@ -6,17 +6,14 @@ defmodule PicPreview do
   @doc """
   Main function for the service.
   """
-  def main(args \\ []) do
-    {parsed, _, _} = OptionParser.parse(args, switches: [url:  :string])
-    # IO.puts("Hello #{parsed[:mode]}")
-    html = get_page(parsed[:url])
+  def get_picture(url) do
+    html = get_page(url)
     head_only = html |> Floki.find("head") |> Floki.raw_html
-    pics = find_picture_candidates(head_only, parsed[:url])
+    pics = find_picture_candidates(head_only, url)
     pics = case (length(pics) >= 2) do
       true -> pics
-      false -> find_picture_candidates(html, parsed[:url])
+      false -> find_picture_candidates(html, url)
     end
-    # IO.inspect pics
     pic = Enum.reduce(pics, {"", 1, 1}, fn(x, acc) ->
       # Fastimage downloads only the necessary amount of data to get dimensions size
       {height, width} = List.to_tuple(Map.values(Fastimage.size(x)))
@@ -25,8 +22,8 @@ defmodule PicPreview do
         true -> acc
       end
     end)
+    pic
     # thumbnex (https://github.com/talklittle/thumbnex) can be used for futher optimization of the image
-    IO.inspect pic
   end
 
   # Try to get html of the given url.
@@ -57,12 +54,6 @@ defmodule PicPreview do
          end
     )
     filter_by_keyword(pics)
-    #has_http_scheme = String.slice(url, 0, 4) == "http"
-    #hostname = case has_http_scheme do
-    #  true -> String.split(url, "/") |> Enum.at(2)
-    #  false -> String.split(url, "/") |> List.first
-    #end
-    # apply additional filter: check whether any pictures has hostname in picture name
   end
 
   # apply additional filter based on key words: icon, logo
