@@ -1,0 +1,7 @@
+=== 0.1.0 (2017.04.11) ===
+
+* Initial release. Console application which takes link to the web site and
+returns a link to the most representative picture of this web site
+For example,
+./pic_preview --url=https://slack.com
+{"https://a.slack-edge.com/0180/img/icons/app-256.png", 256, 256}
